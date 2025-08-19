@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Udhav's List — Aesthetic Todo (Stable)</title>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'&gt;&lt;rect width='256' height='256' rx='56' fill='%23222'/&gt;&lt;path d='M64 132l36 36 92-92' stroke='%23fff' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/&gt;&lt;/svg&gt;" rel="icon"/>
+<style>
+:root {
+  --bg: #0b0f14; --bg2:#0f141b; --card:#131a22; --card2:#111821;
+  --text:#e6ebf3; --muted:#9fb0c6; --accent:#a78bfa; --accent2:#7c3aed;
+  --ring: rgba(167,139,250,.5); --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.35);
+  --wp-image:none; --wp-size:cover; --wp-blur:0px; --wp-dim:0.35;
+}
+/* Themes */
+body.theme-midnight { --bg:#0b0f14; --bg2:#0f141b; --card:#131a22; --card2:#111821; --text:#e6ebf3; --muted:#9fb0c6; --accent:#a78bfa; --accent2:#7c3aed; --ring:rgba(167,139,250,.5); }
+body.theme-minimal  { --bg:#f6f7fb; --bg2:#ffffff; --card:#ffffff; --card2:#f1f4fa; --text:#0f1320; --muted:#667190; --accent:#3b82f6; --accent2:#1d4ed8; --ring:rgba(59,130,246,.5); }
+body.theme-emerald  { --bg:#081210; --bg2:#0c1916; --card:#0f1f1b; --card2:#0c1a16; --text:#e9fbf6; --muted:#a3d8cb; --accent:#34d399; --accent2:#059669; --ring:rgba(52,211,153,.5); }
+body.theme-rose     { --bg:#1a1214; --bg2:#201417; --card:#25171b; --card2:#221419; --text:#ffeaf0; --muted:#f5adc3; --accent:#fb7185; --accent2:#e11d48; --ring:rgba(251,113,133,.5); }
+body.theme-ocean    { --bg:#0b1018; --bg2:#0f1520; --card:#0f1b2a; --card2:#0c1723; --text:#e8f4ff; --muted:#a2c3e6; --accent:#60a5fa; --accent2:#1e40af; --ring:rgba(96,165,250,.5); }
+
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;font-family:ui-rounded,ui-sans-serif,system-ui,-apple-system,Inter,Roboto;
+  background: radial-gradient(1200px 800px at 80% -10%, var(--bg2), transparent),
+              radial-gradient(1200px 800px at -10% 120%, var(--bg2), transparent), var(--bg);
+  color:var(--text);
+}
+/* Wallpaper layers */
+body::before,body::after{content:"";position:fixed;inset:0;z-index:-2}
+body::before{background-image:var(--wp-image);background-size:var(--wp-size);background-position:center;background-repeat:no-repeat;filter:blur(var(--wp-blur));transform:scale(1.05)}
+body::after{z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,var(--wp-dim)),rgba(0,0,0,calc(var(--wp-dim)+.05)))}
+
+.app{max-width:1100px;margin:0 auto;padding:16px}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;backdrop-filter:saturate(1.2) blur(6px)}
+.title{display:flex;align-items:center;gap:10px;font-weight:800}
+.logo{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow)}
+h1{margin:0;font-size:22px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{appearance:none;border:none;background:var(--card2);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.08)}
+select.btn{padding:10px}
+
+.searchbar{display:flex;gap:10px;margin-top:8px}
+.searchbar input{flex:1;padding:12px 14px;border-radius:14px;background:var(--card2);color:var(--text);border:1px solid rgba(255,255,255,.06);outline:none}
+.searchbar input:focus{box-shadow:0 0 0 3px var(--ring)}
+
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{padding:8px 12px;border-radius:999px;background:var(--card2);border:1px solid rgba(255,255,255,.06);color:var(--text);font-weight:600;font-size:13px;cursor:pointer}
+.chip.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent}
+
+.layout{display:grid;grid-template-columns:260px 1fr;gap:16px;margin-top:16px}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel .header{padding:14px 14px 0;font-weight:800;opacity:.95}
+.panel .body{padding:14px}
+
+.projects{display:flex;flex-direction:column;gap:8px}
+.project{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;background:var(--card);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+.project .dot{width:10px;height:10px;border-radius:50%}
+.project .name{font-weight:700}
+.project small{color:var(--muted)}
+.project.active{outline:3px solid var(--ring)}
+
+.addbar{display:flex;gap:10px;margin-bottom:10px}
+.addbar input[type=text]{flex:1;padding:14px;border-radius:14px;background:var(--card2);color:var(--text);border:1px solid rgba(255,255,255,.06);outline:none;font-weight:700}
+.add-adv{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.field{background:var(--card2);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+.field label{display:block;font-size:11px;opacity:.7;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:transparent;border:none;color:var(--text);outline:none;font-size:13px}
+
+.tasks{display:flex;flex-direction:column;gap:10px}
+.task{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.task-header{display:flex;align-items:center;gap:10px}
+.checkbox{width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;cursor:pointer}
+.checkbox.done{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.task .title{font-weight:800}
+.meta{margin-left:auto;display:flex;align-items:center;gap:8px}
+.iconbtn{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--card2);border:1px solid rgba(255,255,255,.06);cursor:pointer}
+.pill{padding:6px 10px;border-radius:999px;background:var(--card2);border:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:700;color:var(--muted)}
+.pill.crit{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none}
+.pill.high{background:linear-gradient(135deg,#fb923c,#ea580c);color:#111}
+.pill.med{background:linear-gradient(135deg,#facc15,#eab308);color:#111}
+.pill.low{background:linear-gradient(135deg,#34d399,#059669);color:#fff}
+
+.task-details{margin-top:10px;display:none;grid-template-columns:1fr;gap:10px}
+.task.open .task-details{display:grid}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{padding:5px 10px;font-size:11px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text)}
+
+.footerbar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;color:var(--muted);font-size:12px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:var(--card);border:1px solid rgba(255,255,255,.08);padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);font-weight:700;z-index:50;display:none;gap:12px;align-items:center}
+.toast .undo{padding:6px 10px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-weight:800;cursor:pointer}
+
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.4);z-index:40}
+.sheet{width:min(680px,92vw);background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.sheet .head{display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--card2)}
+.sheet .content{padding:14px;display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+
+/* Pomodoro styles */
+.pomo-wrap{position:relative;width:280px;height:280px}
+.pomo-ring{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:8}
+.ring-fg{fill:none;stroke:url(#pomoGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:276;stroke-dashoffset:276;transition:stroke-dashoffset .2s linear}
+.pomo-time{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;font-weight:900;letter-spacing:1px}
+.pomo-mode{position:absolute;left:50%;transform:translateX(-50%);bottom:52px;opacity:.85;font-weight:800}
+.pomo-cycle{position:absolute;left:50%;transform:translateX(-50%);bottom:32px;opacity:.6;font-weight:700;font-size:12px}
+
+/* Search panel */
+#searchPanel{position:fixed;top:58px;right:16px;z-index:20;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;backdrop-filter:saturate(1.2) blur(8px);min-width:320px}
+#searchPanel .searchbar{display:flex;gap:8px;margin:0 0 10px 0}
+#searchPanel .searchbar input{flex:1}
+#searchPanel .filters{display:flex;gap:8px;flex-wrap:wrap}
+/* Compact header when search moved out */
+header .searchbar{display:none!important}
+header .filters{display:none!important}
+
+/* Collapsible Projects */
+.panel .header{display:flex;align-items:center;justify-content:space-between}
+#projectsToggle{font-weight:800}
+
+/* --- Header: centered title row + centered toolbar row --- */
+header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px 0}
+header .titlebar{display:flex;align-items:baseline;gap:10px;font-weight:800;justify-content:center;text-align:center}
+header .titlebar h1{margin:0;font-size:22px}
+header .titlebar span{opacity:.65;font-weight:700}
+header .toolrow{order:2;width:100%;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+/* Keep search icon and others compact */
+header .toolrow .btn{white-space:nowrap}
+
+/* Adjust the search panel anchor offset if header grows */
+#searchPanel{top:72px}
+
+/* Ensure the app container still has pleasant spacing */
+.app{padding-top:8px}
+
+/* --- Responsive Toolbar Dropdown --- */
+#toolMenuToggle{position:absolute; right:12px; top:10px; display:none}
+header{position:relative}
+#toolMenuPanel{position:fixed; top:60px; left:0; right:0; z-index:30; display:none}
+#toolMenuPanel .toolrow{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:10px; margin:0 12px; justify-content:center; gap:8px; flex-wrap:wrap}
+/* Mobile breakpoint */
+@media (max-width: 640px){
+  header .toolrow{display:none !important;}
+  #toolMenuToggle{display:inline-flex;}
+}
+
+/* --- Floating bottom tab switcher --- */
+#tabBar{
+  position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+  display:flex; gap:14px; padding:10px 12px;
+  background:var(--card); border-radius:999px; box-shadow:var(--shadow);
+  z-index:40; align-items:center;
+}
+#tabBar .tab{display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:999px; cursor:pointer; user-select:none; opacity:.85; font-weight:700}
+#tabBar .tab .ico{line-height:1}
+#tabBar .tab.active{background:rgba(255,255,255,.06); opacity:1; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+/* Leave space so content isn't hidden behind the tab bar */
+@media (max-width: 800px){
+  .app{padding-bottom:80px}
+}
+
+/* --- Calendar Layout --- */
+.calendar-grid{
+  display:grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap:8px;
+}
+.calendar-grid .dow{
+  text-align:center;
+  font-weight:800;
+  opacity:.8;
+  padding:6px 0;
+}
+.calendar-grid .cell{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:8px;
+  min-height:110px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  box-shadow: var(--shadow);
+}
+.calendar-grid .cell header{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:2px;
+}
+.calendar-grid .date{
+  font-weight:900; opacity:.9;
+}
+.calendar-grid .badgemark{
+  font-size:11px; opacity:.6;
+}
+.calendar-grid .events{
+  display:flex; flex-direction:column; gap:4px; margin-top:4px; overflow:auto;
+}
+.calendar-grid .event{
+  display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:4px 6px; border-radius:10px; background:rgba(255,255,255,.04);
+}
+.calendar-grid .dot{ width:10px; height:10px; border-radius:999px; display:inline-block }
+.calendar-grid .today{ outline:2px solid var(--accent); }
+.calendar-grid .other-month{ opacity:.45 }
+@media (max-width: 640px){
+  .calendar-grid .cell{ min-height:90px }
+}
+</style>
+</head>
+<body class="theme-midnight">
+<div class="app" id="todoScreen">
+<header>
+<div class="title titlebar">
+<div class="logo">✓</div>
+<h1>Techno's To Do's</h1>
+</div>
+<div class="toolbar toolrow"><button class="btn ghost" id="searchToggle">🔍</button>
+<select class="btn" id="theme">
+<option value="theme-midnight">Midnight</option>
+<option value="theme-minimal">Minimal</option>
+<option value="theme-emerald">Emerald</option>
+<option value="theme-rose">Rose</option>
+<option value="theme-ocean">Ocean</option>
+</select>
+<button class="btn" id="wallpaperBtn">Wallpaper</button>
+<button class="btn" id="clearBtn">Clear</button>
+<button class="btn" id="pomodoroBtn">Pomodoro</button></div>
+<button class="btn ghost" id="toolMenuToggle">☰</button></header><div id="toolMenuPanel" style="display:none"><div id="toolMenuInner"></div></div><div id="searchPanel" style="display:none"><div class="searchbar">
+<input id="q" placeholder="Search tasks, tags, notes… ( / to focus )"/>
+<button class="btn" id="newProjectBtn">New Project</button>
+</div><div class="filters">
+<div class="chip" data-filter="inbox">Inbox</div>
+<div class="chip" data-filter="today">Today</div>
+<div class="chip" data-filter="upcoming">Upcoming</div>
+<div class="chip" data-filter="completed">Completed</div>
+<div class="chip active" data-filter="all">All</div>
+</div></div>
+<div class="layout">
+<div class="panel">
+<div class="header">Projects<button class="btn ghost" id="projectsToggle">▸</button></div>
+<div class="body projects" id="projects" style=";display:none;"></div>
+</div>
+<div class="panel">
+<div class="body">
+<div class="addbar">
+<input id="title" placeholder="Quick add a task… ( Enter )" type="text"/>
+<button class="btn primary" id="addBtn">Add</button>
+</div>
+<div class="add-adv" id="adv">
+<div class="field"><label>Due</label><input id="due" type="date"/></div>
+<div class="field"><label>Priority</label>
+<select id="prio"><option value="med">Medium</option><option value="low">Low</option><option value="high">High</option><option value="crit">Critical</option></select>
+</div>
+<div class="field"><label>Project</label><select id="proj"></select></div>
+<div class="field"><label>Tags</label><input id="tags" placeholder="comma,separated"/></div>
+<div class="field"><label>Repeat</label>
+<select id="repeat"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select>
+</div>
+</div>
+<div class="tasks" id="tasks"></div>
+<div class="footerbar"><div id="counts"></div></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Wallpaper Modal -->
+<div class="modal" id="wp">
+<div class="sheet">
+<div class="head"><strong>Wallpaper</strong><button class="btn ghost" id="wpClose">Close</button></div>
+<div class="content">
+<div class="row">
+<div class="field"><label>Upload Image</label><input accept="image/*" id="wpFile" type="file"/></div>
+<div class="field"><label>From URL</label><input id="wpUrl" placeholder="https://example.com/wallpaper.jpg" type="url"/></div>
+</div>
+<div class="row">
+<div class="field"><label>Blur</label><input id="wpBlur" max="16" min="0" step="1" type="range"/></div>
+<div class="field"><label>Dim</label><input id="wpDim" max="0.7" min="0" step="0.05" type="range"/></div>
+</div>
+<div class="row">
+<div class="field"><label>Fit</label><select id="wpFit"><option value="cover">Cover</option><option value="contain">Contain</option></select></div>
+<div class="field" style="display:flex;align-items:end;gap:8px">
+<button class="btn" id="wpApply">Apply</button>
+<button class="btn ghost" id="wpRemove">Remove</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button class="undo" id="undoBtn" style="display:none">Undo</button></div>
+<script>
+(function(){
+  var DB = 'udhav.list.stable.v1';
+  var state = load() || init();
+  var filter = 'all';
+
+  // Elements
+  var E = function(id){ return document.getElementById(id); };
+  var projectsEl = E('projects'), tasksEl = E('tasks');
+  var titleEl = E('title'), dueEl = E('due'), prioEl = E('prio'), projEl = E('proj'), tagsEl = E('tags'), repeatEl = E('repeat');
+  var themeEl = E('theme');
+
+  // Init
+  applyTheme(state.settings.theme);
+  applyWallpaper(state.settings.wallpaper);
+  buildProjects();
+  fillProjectSelector();
+  render();
+
+  // Header actions
+  themeEl.onchange = function(){ applyTheme(this.value); toast('Theme updated'); };
+  
+   
+  E('clearBtn').onclick = function(){ if(confirm('Clear all data?')){ localStorage.removeItem(DB); location.reload(); } };
+  E('newProjectBtn').onclick = function(){ var n = prompt('Project name'); if(!n) return; var p = {id: uid(), name:n, color:'#9ca3af'}; state.projects.push(p); save(); buildProjects(); fillProjectSelector(); toast('Project added'); };
+
+  // Filters
+  Array.prototype.forEach.call(document.querySelectorAll('.filters .chip[data-filter]'), function(chip){
+    chip.addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.filters .chip[data-filter]'), function(c){ c.classList.remove('active'); });
+      this.classList.add('active'); filter = this.getAttribute('data-filter'); render();
+    });
+  });
+
+  // Add task
+  E('addBtn').onclick = add;
+  titleEl.addEventListener('keydown', function(e){ if(e.key==='Enter') add(); });
+
+  // Search
+  E('q').oninput = render;
+  window.addEventListener('keydown', function(e){ if(e.key==='/'){ e.preventDefault(); E('q').focus(); } });
+
+  // Wallpaper modal
+  var wp = E('wp');
+  E('wallpaperBtn').onclick = function(){ syncWpControls(); wp.style.display='flex'; };
+  E('wpClose').onclick = function(){ wp.style.display='none'; };
+  E('wpApply').onclick = function(){ var w = { url:E('wpUrl').value.trim(), blur:+E('wpBlur').value||0, dim:+E('wpDim').value||0.35, fit:E('wpFit').value||'cover' }; state.settings.wallpaper=w; save(); applyWallpaper(w); wp.style.display='none'; toast('Wallpaper updated'); };
+  E('wpRemove').onclick = function(){ state.settings.wallpaper=null; save(); applyWallpaper(null); syncWpControls(); toast('Wallpaper removed'); };
+  E('wpFile').onchange = function(ev){ var f=ev.target.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ E('wpUrl').value = r.result; }; r.readAsDataURL(f); };
+
+  function syncWpControls(){ var w = state.settings.wallpaper || {url:'',blur:8,dim:0.35,fit:'cover'}; E('wpUrl').value=w.url||''; E('wpBlur').value=w.blur||8; E('wpDim').value=w.dim||0.35; E('wpFit').value=w.fit||'cover'; }
+
+  // Core
+  function init(){
+    var inbox = {id: uid(), name:'Inbox', color:'#9fb0c6'};
+    return {
+      settings: { theme:'theme-midnight', wallpaper:null },
+      projects: [inbox, {id: uid(), name:'Work', color:'#34d399'}, {id: uid(), name:'Personal', color:'#60a5fa'}],
+      tasks: [
+        mkTask('Welcome to Udhav\'s List ✨', inbox.id, {priority:'high', tags:['intro','demo']}),
+        mkTask('Tap a task to open details', inbox.id, {tags:['tips']}),
+        mkTask('Set a due date →', inbox.id, {due: today(1), tags:['today']})
+      ]
+    };
+  }
+
+  function mkTask(title, projectId, opts){
+    opts = opts || {};
+    return { id: uid(), title: title, notes: opts.notes || '', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), due: opts.due || '', projectId: projectId, tags: opts.tags || [], priority: opts.priority || 'med', completed: false, repeat: opts.repeat || 'none' };
+  }
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(DB)); }catch(e){ return null; } }
+  function save(){ localStorage.setItem(DB, JSON.stringify(state)); }
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+  function today(add){ var d=new Date(); d.setDate(d.getDate()+(add||0)); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+
+  function applyTheme(t){ document.body.className = t; state.settings.theme=t; save(); themeEl.value=t; }
+  function applyWallpaper(w){ if(!w || !w.url){ document.documentElement.style.setProperty('--wp-image','none'); document.documentElement.style.setProperty('--wp-blur','0px'); document.documentElement.style.setProperty('--wp-dim','0.0'); return; } document.documentElement.style.setProperty('--wp-image',"url('"+w.url+"')"); document.documentElement.style.setProperty('--wp-size', w.fit||'cover'); document.documentElement.style.setProperty('--wp-blur', (w.blur||0)+'px'); document.documentElement.style.setProperty('--wp-dim', String((typeof w.dim==='number'?w.dim:0.35))); }
+
+  function buildProjects(){
+    projectsEl.innerHTML='';
+    state.projects.forEach(function(p){
+      var el = document.createElement('div'); el.className='project'; el.dataset.id=p.id;
+      el.innerHTML = '<div class="dot" style="background:'+p.color+'"></div><div class="name">'+esc(p.name)+'</div><small>• '+state.tasks.filter(function(t){ return t.projectId===p.id && !t.completed; }).length+'</small><div style="margin-left:auto;display:flex;gap:6px;"><button class="btn ghost" data-act="edit">Edit</button><button class="btn ghost" data-act="del">Delete</button></div>';
+      el.addEventListener('click', function(e){
+        var act = e.target && e.target.getAttribute('data-act');
+        if(act==='edit'){ e.stopPropagation(); var nn = prompt('Rename project', p.name); if(!nn) return; p.name=nn; save(); buildProjects(); render(); return; }
+        if(act==='del'){ e.stopPropagation(); if(p.id===state.projects[0].id){ alert('Cannot delete Inbox'); return; } if(confirm('Delete project and move its tasks to Inbox?')){ var inboxId=state.projects[0].id; state.tasks.forEach(function(t){ if(t.projectId===p.id) t.projectId=inboxId; }); state.projects = state.projects.filter(function(x){ return x.id!==p.id; }); save(); buildProjects(); fillProjectSelector(); render(); } return; }
+        Array.prototype.forEach.call(document.querySelectorAll('.project'), function(x){ x.classList.remove('active'); }); el.classList.add('active'); filter='project:'+p.id; Array.prototype.forEach.call(document.querySelectorAll('.filters .chip'), function(x){ x.classList.remove('active'); }); render();
+      });
+      projectsEl.appendChild(el);
+    });
+  }
+
+  function fillProjectSelector(){
+    projEl.innerHTML='';
+    state.projects.forEach(function(p){ var o=document.createElement('option'); o.value=p.id; o.textContent=p.name; projEl.appendChild(o); });
+    projEl.value = state.projects[0].id;
+  }
+
+  function add(){
+    var title = titleEl.value.trim(); if(!title) return;
+    var t = mkTask(title, projEl.value, {due: dueEl.value, priority: prioEl.value, tags: tagsEl.value.split(',').map(function(s){return s.trim();}).filter(Boolean), repeat: repeatEl.value});
+    state.tasks.unshift(t); save();
+    titleEl.value=''; tagsEl.value=''; dueEl.value=''; render(); toast('Task added');
+  }
+
+  function render(){
+    var q = E('q').value.toLowerCase();
+    var list = state.tasks.slice();
+    var todayISO = today(0);
+    if(filter==='inbox'){ list = list.filter(function(t){ return t.projectId===state.projects[0].id && !t.completed; }); }
+    else if(filter==='today'){ list = list.filter(function(t){ return !t.completed && t.due===todayISO; }); }
+    else if(filter==='upcoming'){ list = list.filter(function(t){ return !t.completed && t.due && t.due>todayISO; }); }
+    else if(filter==='completed'){ list = list.filter(function(t){ return t.completed; }); }
+    else if(filter.indexOf('project:')===0){ var pid = filter.split(':')[1]; list = list.filter(function(t){ return t.projectId===pid && !t.completed; }); }
+    if(q){ list = list.filter(function(t){ return (t.title+' '+t.notes+' '+t.tags.join(' ')).toLowerCase().indexOf(q) !== -1; }); }
+
+    // sort smart: completed last, earliest due first, then priority
+    var pr = {crit:3,high:2,med:1,low:0};
+    list.sort(function(a,b){
+      if(a.completed!==b.completed) return a.completed?1:-1;
+      if((a.due||'') !== (b.due||'')) return (a.due||'') < (b.due||'') ? -1 : 1;
+      var d = pr[b.priority]-pr[a.priority]; if(d) return d;
+      return 0;
+    });
+
+    tasksEl.innerHTML='';
+    var done = state.tasks.filter(function(t){return t.completed;}).length;
+    var active = state.tasks.length - done;
+    E('counts').textContent = active+' active • '+done+' done';
+
+    list.forEach(function(t){ tasksEl.appendChild(renderTask(t)); });
+  }
+
+  function renderTask(t){
+    var el = document.createElement('div'); el.className='task'; el.dataset.id=t.id;
+    var overdue = t.due && t.due < today(0) && !t.completed;
+    var dueLabel = t.due ? (overdue ? 'Overdue ' : '') + t.due : 'No due';
+    var tags = t.tags.map(function(tag){ return '<span class="tag">#'+esc(tag)+'</span>'; }).join(' ');
+    el.innerHTML = '<div class="task-header">\
+      <div class="checkbox '+(t.completed?'done':'')+'" data-act="toggle">'+(t.completed?'✓':'')+'</div>\
+      <div class="title" style="flex:1">'+esc(t.title)+'</div>\
+      <div class="meta">\
+        <span class="pill '+t.priority+'">'+t.priority+'</span>\
+        <span class="pill">'+dueLabel+'</span>\
+        <button class="iconbtn" title="Details" data-act="open">⋯</button>\
+        <button class="iconbtn" title="Delete" data-act="trash">🗑️</button>\
+      </div>\
+    </div>\
+    <div class="task-details">\
+      <div class="field"><label>Notes</label><textarea rows="3" data-field="notes">'+esc(t.notes)+'</textarea></div>\
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">\
+        <div class="field"><label>Due</label><input type="date" data-field="due" value="'+(t.due||'')+'"></div>\
+        <div class="field"><label>Priority</label><select data-field="priority">\
+          <option value="low" '+(t.priority==='low'?'selected':'')+'>Low</option>\
+          <option value="med" '+(t.priority==='med'?'selected':'')+'>Medium</option>\
+          <option value="high" '+(t.priority==='high'?'selected':'')+'>High</option>\
+          <option value="crit" '+(t.priority==='crit'?'selected':'')+'>Critical</option>\
+        </select></div>\
+        <div class="field"><label>Project</label><select data-field="projectId">'+state.projects.map(function(p){return '<option value=\"'+p.id+'\" '+(t.projectId===p.id?'selected':'')+'>'+esc(p.name)+'</option>';}).join('')+'</select></div>\
+        <div class="field"><label>Repeat</label><select data-field="repeat">\
+          <option value="none" '+(t.repeat==='none'?'selected':'')+'>None</option>\
+          <option value="daily" '+(t.repeat==='daily'?'selected':'')+'>Daily</option>\
+          <option value="weekly" '+(t.repeat==='weekly'?'selected':'')+'>Weekly</option>\
+          <option value="monthly" '+(t.repeat==='monthly'?'selected':'')+'>Monthly</option>\
+        </select></div>\
+      </div>\
+      <div class="field"><label>Tags (comma separated)</label><input data-field="tags" value="'+esc(t.tags.join(', '))+'"></div>\
+      <div style="display:flex;gap:8px;flex-wrap:wrap">\
+        <button class="btn" data-act="snooze">Snooze +1d</button>\
+        <button class="btn" data-act="dup">Duplicate</button>\
+        <button class="btn ghost" data-act="del">Delete</button>\
+      </div>\
+      <div class="tags">'+tags+'</div>\
+    </div>';
+
+    // Event wiring
+    el.addEventListener('click', function(e){
+      var act = e.target && e.target.getAttribute('data-act');
+      if(act==='toggle'){ t.completed = !t.completed; save(); render(); }
+      if(act==='open'){ el.classList.toggle('open'); }
+      if(act==='trash' || act==='del'){ deleteTask(t); }
+      if(act==='snooze'){ t.due = t.due || today(0); var d = new Date(t.due); d.setDate(d.getDate()+1); t.due = d.toISOString().slice(0,10); save(); render(); toast('Snoozed +1 day'); }
+      if(act==='dup'){ var c = JSON.parse(JSON.stringify(t)); c.id = uid(); c.title = t.title + ' (copy)'; c.completed=false; state.tasks.unshift(c); save(); render(); }
+    });
+
+    Array.prototype.forEach.call(el.querySelectorAll('.task-details [data-field]'), function(inp){
+      inp.addEventListener('change', function(){
+        var f = inp.getAttribute('data-field'); var v = inp.value;
+        if(f==='tags'){ v = v.split(',').map(function(s){return s.trim();}).filter(Boolean); }
+        t[f]=v; t.updatedAt=new Date().toISOString(); save(); render();
+      });
+    });
+
+    return el;
+  }
+
+  function deleteTask(t){
+    var idx = state.tasks.findIndex(function(x){ return x.id===t.id; });
+    if(idx<0) return;
+    var removed = state.tasks.splice(idx,1)[0]; save(); render();
+    toast('Task deleted', 'Undo', function(){ state.tasks.unshift(removed); save(); render(); });
+  }
+
+  // Toast
+  var toastTimer=null;
+  function toast(msg, action, handler){
+    var el = document.getElementById('toast'); var undo = document.getElementById('undoBtn');
+    document.getElementById('toastMsg').textContent = msg;
+    if(action && handler){ undo.textContent=action; undo.style.display='inline-block'; undo.onclick=function(){ handler(); el.style.display='none'; }; }
+    else{ undo.style.display='none'; undo.onclick=null; }
+    el.style.display='flex'; if(toastTimer) clearTimeout(toastTimer); toastTimer=setTimeout(function(){ el.style.display='none'; }, 2200);
+  }
+
+  function esc(s){ return String(s||'').replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]; }); }
+})();</script>
+<div id="pomoScreen" style="display:none">
+<header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;backdrop-filter:saturate(1.2) blur(6px)">
+<div class="title" style="display:flex;align-items:center;gap:10px;font-weight:800">
+<div class="logo">⏱</div>
+<h1 style="margin:0;font-size:22px">Pomodoro</h1>
+<span style="opacity:.6;font-weight:700;">— deep focus</span>
+</div>
+<div class="toolbar" style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn ghost" id="backToTodos">← Back</button>
+</div>
+</header>
+<div class="app" style="max-width:900px;margin:0 auto;padding:16px">
+<div class="panel" style="padding:20px">
+<div class="body" style="display:grid;gap:18px">
+<!-- Timer Display -->
+<div style="display:grid;place-items:center;padding:10px">
+<div class="pomo-wrap">
+<svg class="pomo-ring" height="280" viewbox="0 0 100 100" width="280">
+<defs>
+<lineargradient id="pomoGrad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="var(--accent)"></stop>
+<stop offset="100%" stop-color="var(--accent2)"></stop>
+</lineargradient>
+</defs>
+<circle class="ring-bg" cx="50" cy="50" r="44"></circle>
+<circle class="ring-fg" cx="50" cy="50" r="44"></circle>
+</svg>
+<div class="pomo-time" id="pomoTime">25:00</div>
+<div class="pomo-mode" id="pomoMode">Focus</div>
+<div class="pomo-cycle" id="pomoCycle">Cycle 1/4</div>
+</div>
+</div>
+<!-- Controls -->
+<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+<button class="btn primary" id="pomoStart">Start</button>
+<button class="btn ghost" id="pomoPause">Pause</button>
+<button class="btn" id="pomoReset">Reset</button>
+</div>
+<!-- Mode Tabs -->
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+<button class="chip active" data-mode="focus">Focus</button>
+<button class="chip" data-mode="short">Short Break</button>
+<button class="chip" data-mode="long">Long Break</button>
+</div>
+<!-- Settings -->
+<div class="panel" style="background:var(--card);padding:16px">
+<div class="header" style="padding:0 0 10px;font-weight:800;opacity:.95">Settings</div>
+<div class="add-adv" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px">
+<div class="field"><label>Focus (min)</label><input id="setFocus" max="120" min="1" type="number" value="25"/></div>
+<div class="field"><label>Short Break (min)</label><input id="setShort" max="60" min="1" type="number" value="5"/></div>
+<div class="field"><label>Long Break (min)</label><input id="setLong" max="60" min="1" type="number" value="15"/></div>
+<div class="field"><label>Cycles before Long</label><input id="setCycles" max="12" min="1" type="number" value="4"/></div>
+<div class="field"><label>Auto-Start Next</label>
+<select id="setAuto">
+<option value="on">On</option>
+<option selected="" value="off">Off</option>
+</select>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn" id="savePomo">Save</button>
+<button class="btn ghost" id="defaultPomo">Defaults</button>
+<button class="btn ghost" id="pomoSound">🔔 Sound: Off</button>
+</div>
+</div>
+<!-- Tips -->
+<div class="footerbar" style="justify-content:center">
+<div>Space = start/pause · R = reset · 1/2/3 = switch mode</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+  // Screen switching
+  var todo = document.getElementById('todoScreen');
+  var pomo = document.getElementById('pomoScreen');
+  var btn = document.getElementById('pomodoroBtn');
+  var back = document.getElementById('backToTodos');
+  if(btn){ btn.addEventListener('click', function(){ todo.style.display='none'; pomo.style.display='block'; }); }
+  if(back){ back.addEventListener('click', function(){ pomo.style.display='none'; todo.style.display='block'; }); }
+
+  // Pomodoro state
+  var DB = 'udhav.pomo.v1';
+  var ring = document.querySelector('.ring-fg');
+  var timeEl = document.getElementById('pomoTime');
+  var modeEl = document.getElementById('pomoMode');
+  var cycleEl = document.getElementById('pomoCycle');
+  var startBtn = document.getElementById('pomoStart');
+  var pauseBtn = document.getElementById('pomoPause');
+  var resetBtn = document.getElementById('pomoReset');
+  var modeBtns = Array.prototype.slice.call(document.querySelectorAll('#pomoScreen .chip[data-mode]'));
+  var setFocus = document.getElementById('setFocus');
+  var setShort = document.getElementById('setShort');
+  var setLong  = document.getElementById('setLong');
+  var setCycles= document.getElementById('setCycles');
+  var setAuto  = document.getElementById('setAuto');
+  var saveBtn  = document.getElementById('savePomo');
+  var defBtn   = document.getElementById('defaultPomo');
+  var soundBtn = document.getElementById('pomoSound');
+
+  var beep = new Audio('data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYAAABhYWFhYWFhYQ=='); // very short click
+
+  var state = load() || {focus:25, short:5, long:15, cycles:4, auto:false, sound:false};
+  var mode = 'focus';
+  var total = state.focus*60;
+  var left = total;
+  var running = false;
+  var tickTimer = null;
+  var cycle = 1;
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(DB)); }catch(e){ return null; } }
+  function save(){ localStorage.setItem(DB, JSON.stringify(state)); }
+  function fmt(s){ s = Math.max(0, s|0); var m = (s/60)|0, r = (s%60)|0; return String(m).padStart(2,'0')+':'+String(r).padStart(2,'0'); }
+  function setRing(progress){ var C = 2*Math.PI*44; ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C*(1-progress); }
+  function setMode(m){
+    mode = m;
+    modeBtns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode')===m); });
+    var dur = state[m==='focus'?'focus':(m==='short'?'short':'long')]*60;
+    total = dur; left = dur; running=false; clearInterval(tickTimer); tickTimer=null;
+    update();
+  }
+  function update(){
+    timeEl.textContent = fmt(left);
+    modeEl.textContent = (mode==='focus'?'Focus':(mode==='short'?'Short Break':'Long Break'));
+    cycleEl.textContent = 'Cycle '+cycle+'/'+state.cycles;
+    setRing(1 - (left/total));
+  }
+  function nextSegment(){
+    if(mode==='focus'){
+      if(cycle % state.cycles === 0){ setMode('long'); }
+      else { setMode('short'); }
+    }else{
+      cycle = (mode==='long') ? 1 : cycle+1;
+      setMode('focus');
+    }
+    if(state.auto){ start(); }
+  }
+  function start(){
+    if(running) return;
+    running = true;
+    tickTimer = setInterval(function(){
+      left--;
+      if(left <= 0){
+        left = 0; running=false; clearInterval(tickTimer); tickTimer=null;
+        if(state.sound){ try{ beep.currentTime=0; beep.play(); }catch(e){} }
+        setRing(1); // full
+        setTimeout(nextSegment, 600);
+      }
+      update();
+    }, 1000);
+  }
+  function pause(){ running=false; clearInterval(tickTimer); tickTimer=null; }
+  function reset(){ pause(); left = total; update(); }
+
+  startBtn.addEventListener('click', start);
+  pauseBtn.addEventListener('click', pause);
+  resetBtn.addEventListener('click', reset);
+  modeBtns.forEach(function(b){ b.addEventListener('click', function(){ setMode(b.getAttribute('data-mode')); }); });
+
+  // Save settings
+  function syncInputs(){
+    setFocus.value = state.focus; setShort.value = state.short; setLong.value = state.long;
+    setCycles.value = state.cycles; setAuto.value = state.auto ? 'on':'off';
+    soundBtn.textContent = '🔔 Sound: ' + (state.sound ? 'On':'Off');
+  }
+  syncInputs();
+
+  saveBtn.addEventListener('click', function(){
+    state.focus = Math.max(1, parseInt(setFocus.value||25,10));
+    state.short = Math.max(1, parseInt(setShort.value||5,10));
+    state.long  = Math.max(1, parseInt(setLong.value ||15,10));
+    state.cycles= Math.max(1, parseInt(setCycles.value||4,10));
+    state.auto  = (setAuto.value==='on');
+    save();
+    setMode(mode); // reapply duration
+    toast('Pomodoro settings saved');
+  });
+  defBtn.addEventListener('click', function(){
+    state = {focus:25, short:5, long:15, cycles:4, auto:false, sound:false};
+    save(); syncInputs(); setMode('focus'); cycle=1; toast('Defaults restored');
+  });
+  soundBtn.addEventListener('click', function(){
+    state.sound = !state.sound; save(); syncInputs();
+  });
+
+  // Shortcuts
+  window.addEventListener('keydown', function(e){
+    if(pomo.style.display==='block'){
+      if(e.code==='Space'){ e.preventDefault(); running?pause():start(); }
+      if(e.key==='r' || e.key==='R'){ reset(); }
+      if(e.key==='1'){ setMode('focus'); }
+      if(e.key==='2'){ setMode('short'); }
+      if(e.key==='3'){ setMode('long'); }
+    }
+  });
+
+  // Initialize
+  setMode('focus'); update();
+})();
+</script>
+<script>
+(function(){
+  // Robust wallpaper controller that overrides broken handlers and persists independently.
+  var root = document.documentElement;
+  var modal = document.getElementById('wp');
+  var openBtn = document.getElementById('wallpaperBtn');
+  var closeBtn = document.getElementById('wpClose');
+  var urlIn = document.getElementById('wpUrl');
+  var fileIn = document.getElementById('wpFile');
+  var blurIn = document.getElementById('wpBlur');
+  var dimIn = document.getElementById('wpDim');
+  var fitIn = document.getElementById('wpFit');
+  var applyBtn = document.getElementById('wpApply');
+  var removeBtn = document.getElementById('wpRemove');
+
+  var KEY = 'udhav.wallpaper.fix.v1';
+
+  function loadFix(){
+    try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; }
+  }
+  function saveFix(w){
+    try{ localStorage.setItem(KEY, JSON.stringify(w)); }catch(e){}
+  }
+  function applyVars(w){
+    if(!w || !w.url){
+      root.style.setProperty('--wp-image', 'none');
+      root.style.setProperty('--wp-size', 'cover');
+      root.style.setProperty('--wp-blur', '0px');
+      root.style.setProperty('--wp-dim', '0.0');
+      return;
+    }
+    root.style.setProperty('--wp-image', 'url("'+ w.url.replace(/"/g,'') +'")');
+    root.style.setProperty('--wp-size', (w.fit || 'cover'));
+    root.style.setProperty('--wp-blur', (Number(w.blur)||0) + 'px');
+    root.style.setProperty('--wp-dim', String(typeof w.dim==='number' ? w.dim : 0.35));
+  }
+  function syncInputs(w){
+    w = w || {};
+    if(urlIn) urlIn.value = w.url || '';
+    if(blurIn) blurIn.value = (typeof w.blur==='number'? w.blur : 0);
+    if(dimIn) dimIn.value = (typeof w.dim==='number'? w.dim : 0.35);
+    if(fitIn) fitIn.value = w.fit || 'cover';
+  }
+
+  // Boot: restore previous wallpaper
+  var initial = loadFix();
+  if(initial){ applyVars(initial); }
+
+  // Open/close
+  if(openBtn){ openBtn.onclick = function(){ syncInputs(loadFix()); if(modal) modal.style.display='flex'; }; }
+  if(closeBtn){ closeBtn.onclick = function(){ if(modal) modal.style.display='none'; }; }
+
+  // File -> dataURL
+  if(fileIn){
+    fileIn.onchange = function(ev){
+      var f = ev.target.files && ev.target.files[0];
+      if(!f) return;
+      var r = new FileReader();
+      r.onload = function(){ if(urlIn){ urlIn.value = r.result; } };
+      r.readAsDataURL(f);
+    };
+  }
+
+  // Apply
+  if(applyBtn){
+    applyBtn.onclick = function(){
+      var w = {
+        url: urlIn && urlIn.value ? urlIn.value.trim() : '',
+        blur: blurIn ? Number(blurIn.value||0) : 0,
+        dim: dimIn ? Number(dimIn.value||0.35) : 0.35,
+        fit: fitIn ? (fitIn.value||'cover') : 'cover'
+      };
+      if(!w.url){ // nothing provided
+        applyVars(null); saveFix(null);
+      }else{
+        applyVars(w); saveFix(w);
+      }
+      if(modal) modal.style.display='none';
+    };
+  }
+
+  // Remove
+  if(removeBtn){
+    removeBtn.onclick = function(){
+      applyVars(null); saveFix(null);
+      syncInputs(null);
+    };
+  }
+})();
+</script>
+<script>
+(function(){
+  var panel = document.getElementById('searchPanel');
+  var toggle = document.getElementById('searchToggle');
+  var q = document.getElementById('q');
+  function openPanel(){
+    if(!panel) return;
+    panel.style.display='block';
+    setTimeout(function(){ if(q){ q.focus(); } }, 0);
+    document.addEventListener('click', onDoc, true);
+    document.addEventListener('keydown', onKey, true);
+  }
+  function closePanel(){
+    if(!panel) return;
+    panel.style.display='none';
+    document.removeEventListener('click', onDoc, true);
+    document.removeEventListener('keydown', onKey, true);
+  }
+  function onDoc(e){
+    if(!panel.contains(e.target) && e.target !== toggle){
+      closePanel();
+    }
+  }
+  function onKey(e){
+    if(e.key === 'Escape'){ closePanel(); }
+    if(e.key === '/' && !e.target.closest('input,textarea')){
+      e.preventDefault();
+      openPanel();
+    }
+  }
+  if(toggle){
+    toggle.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(panel.style.display==='none' || panel.style.display===''){
+        openPanel();
+      }else{
+        closePanel();
+      }
+    });
+  }
+  // Keep global '/' shortcut working even if panel closed
+  document.addEventListener('keydown', onKey, true);
+})();
+</script>
+<script>
+(function(){
+  var KEY = 'udhav.wallpaper.fix.v1';
+  var DB  = 'udhav.list.stable.v1';
+  function readLS(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+  function writeLS(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+  // Load app state if present
+  var state = null;
+  try{ state = JSON.parse(localStorage.getItem(DB)) || null; }catch(e){ state = null; }
+
+  // Merge wallpaper from either source into both, once on boot
+  var fixW = readLS(KEY);
+  var appW = state && state.settings ? state.settings.wallpaper : null;
+  var chosen = fixW || appW || null;
+  if(state && state.settings){
+    state.settings.wallpaper = chosen;
+    writeLS(DB, state);
+  }
+  writeLS(KEY, chosen);
+
+  // Monkey-patch applyWallpaper to also persist to both stores
+  try{
+    var _apply = window.applyWallpaper || null;
+    if(typeof _apply === 'function'){
+      window.applyWallpaper = function(w){
+        try{
+          if(state){
+            state = JSON.parse(localStorage.getItem(DB)) || state;
+            if(state && state.settings){ state.settings.wallpaper = w; writeLS(DB, state); }
+          }
+          writeLS(KEY, w);
+        }catch(e){}
+        return _apply.call(this, w);
+      };
+    }
+  }catch(e){}
+
+  // Also patch the Apply/Remove buttons to double-save in case original handlers bypass applyWallpaper
+  var applyBtn = document.getElementById('wpApply');
+  var removeBtn = document.getElementById('wpRemove');
+  if(applyBtn){
+    applyBtn.addEventListener('click', function(){
+      var urlIn = document.getElementById('wpUrl');
+      var blurIn = document.getElementById('wpBlur');
+      var dimIn  = document.getElementById('wpDim');
+      var fitIn  = document.getElementById('wpFit');
+      var w = {
+        url: urlIn && urlIn.value ? urlIn.value.trim() : '',
+        blur: blurIn ? Number(blurIn.value||0) : 0,
+        dim:  dimIn ? Number(dimIn.value||0.35) : 0.35,
+        fit:  fitIn ? (fitIn.value||'cover') : 'cover'
+      };
+      if(!w.url){ w = null; }
+      if(state && state.settings){ state.settings.wallpaper = w; writeLS(DB, state); }
+      writeLS(KEY, w);
+    }, true);
+  }
+  if(removeBtn){
+    removeBtn.addEventListener('click', function(){
+      if(state && state.settings){ state.settings.wallpaper = null; writeLS(DB, state); }
+      writeLS(KEY, null);
+    }, true);
+  }
+})();
+</script>
+<script>
+(function(){
+  var KEY = 'udhav.projects.collapsed.v1';
+  var btn = document.getElementById('projectsToggle');
+  var list = document.getElementById('projects');
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+  function save(v){ try{ localStorage.setItem(KEY, JSON.stringify(v)); }catch(e){} }
+  function setCollapsed(c){
+    if(!list || !btn) return;
+    list.style.display = c ? 'none' : '';
+    btn.textContent = c ? '▸' : '▾';
+  }
+  var c = load();
+  // Default collapsed if no preference saved
+  if(c === null){ c = true; }
+  setCollapsed(c);
+  if(btn){
+    btn.addEventListener('click', function(){
+      c = !c; setCollapsed(c); save(c);
+    });
+  }
+})();
+</script>
+<script>
+(function(){
+  var panel = document.getElementById('toolMenuPanel');
+  var inner = document.getElementById('toolMenuInner');
+  var toggle = document.getElementById('toolMenuToggle');
+  var header = document.querySelector('header');
+  var toolrow = header ? header.querySelector('.toolrow') : null;
+  if(!panel || !inner || !toggle || !toolrow) return;
+
+  function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+
+  function moveToPanel(){
+    if(toolrow && inner && toolrow.parentElement !== inner){
+      inner.appendChild(toolrow); // preserves event listeners
+    }
+  }
+  function moveToHeader(){
+    if(toolrow && header && toolrow.parentElement !== header){
+      header.appendChild(toolrow);
+    }
+  }
+
+  function applyPlacement(){
+    if(isMobile()){ moveToPanel(); }
+    else{ moveToHeader(); hidePanel(); }
+  }
+
+  function showPanel(){
+    if(isMobile()){
+      moveToPanel();
+      panel.style.display = 'block';
+      document.addEventListener('click', onDoc, true);
+      document.addEventListener('keydown', onKey, true);
+    }
+  }
+  function hidePanel(){
+    panel.style.display = 'none';
+    document.removeEventListener('click', onDoc, true);
+    document.removeEventListener('keydown', onKey, true);
+  }
+  function onDoc(e){
+    if(!panel.contains(e.target) && e.target !== toggle){
+      hidePanel();
+    }
+  }
+  function onKey(e){
+    if(e.key === 'Escape'){ hidePanel(); }
+  }
+  toggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    if(panel.style.display === 'block'){ hidePanel(); } else { showPanel(); }
+  });
+
+  window.addEventListener('resize', applyPlacement);
+  // Initial placement
+  applyPlacement();
+})();
+</script>
+<div id="tabBar">
+<div class="tab" data-tab="home">
+<div class="ico">🏠</div>
+<div class="label">Home</div>
+</div>
+<div class="tab" data-tab="clock">
+<div class="ico">⏱</div>
+<div class="label">Clock</div>
+</div>
+<div class="tab" data-tab="calendar">
+<div class="ico">📅</div>
+<div class="label">Calendar</div>
+</div>
+</div>
+<script>
+(function(){
+  var todo = document.getElementById('todoScreen');
+  var pomo = document.getElementById('pomoScreen');
+  var cal  = document.getElementById('calendarScreen');
+  var bar  = document.getElementById('tabBar');
+  if(!bar || !todo || !pomo) return;
+
+  var tabs = Array.prototype.slice.call(bar.querySelectorAll('.tab'));
+  function setTab(name){
+    tabs.forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-tab')===name); });
+    if(name==='home'){ if(todo) todo.style.display='block'; if(pomo) pomo.style.display='none'; if(cal) cal.style.display='none'; }
+    if(name==='clock'){ if(todo) todo.style.display='none';  if(pomo) pomo.style.display='block'; if(cal) cal.style.display='none'; }
+    if(name==='calendar'){ if(todo) todo.style.display='none'; if(pomo) pomo.style.display='none'; if(cal) cal.style.display='block'; }
+    // Persist selection
+    try{ localStorage.setItem('udhav.tab.active', name); }catch(e){}
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ setTab(t.getAttribute('data-tab')); });
+  });
+
+  // Sync with existing buttons if present
+  var pomodoroBtn = document.getElementById('pomodoroBtn');
+  var backBtn = document.getElementById('backToTodos');
+  if(pomodoroBtn){ pomodoroBtn.addEventListener('click', function(){ setTab('clock'); }, true); }
+  if(backBtn){ backBtn.addEventListener('click', function(){ setTab('home'); }, true); }
+
+  // Boot: restore last tab, default to home
+  var saved = null;
+  try{ saved = localStorage.getItem('udhav.tab.active'); }catch(e){}
+  setTab(saved || 'home');
+})();
+</script>
+<div id="calendarScreen" style="display:none">
+<header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 16px;backdrop-filter:saturate(1.2) blur(6px)">
+<div class="titlebar" style="display:flex;align-items:baseline;gap:10px;font-weight:800;justify-content:center;text-align:center">
+<div class="logo">📅</div>
+<h1 style="margin:0;font-size:22px">Calendar</h1>
+</div>
+</header>
+<div class="app" style="max-width:1000px;margin:0 auto;padding:16px">
+<div class="panel">
+<div class="header" style="display:flex;align-items:center;justify-content:space-between">
+<div style="display:flex;gap:6px;align-items:center">
+<button class="btn ghost" id="calPrev">←</button>
+<div id="calMonthLabel" style="font-weight:900"></div>
+<button class="btn ghost" id="calNext">→</button>
+</div>
+<div style="display:flex;gap:6px;align-items:center">
+<button class="btn" id="calToday">Today</button>
+<button class="btn" id="calAdd">Add Event</button>
+</div>
+</div>
+<div class="body">
+<div class="calendar-grid" id="calendarGrid"></div>
+</div>
+</div>
+</div>
+<!-- Calendar Modal -->
+<div class="modal" id="calModal" style="display:none">
+<div class="sheet" style="min-width:320px;max-width:460px">
+<div class="head"><strong id="calModalTitle">New Event</strong><button class="btn ghost" id="calClose">Close</button></div>
+<div class="content">
+<div class="row">
+<div class="field"><label>Title</label><input id="evTitle" placeholder="Event title"/></div>
+</div>
+<div class="row">
+<div class="field"><label>Date</label><input id="evDate" type="date"/></div>
+<div class="field"><label>Time</label><input id="evTime" type="time"/></div>
+</div>
+<div class="row">
+<div class="field"><label>Color</label>
+<select id="evColor">
+<option value="#60a5fa">Blue</option>
+<option value="#34d399">Green</option>
+<option value="#f59e0b">Amber</option>
+<option value="#ef4444">Red</option>
+<option selected="" value="#a78bfa">Purple</option>
+</select>
+</div>
+<div class="field"><label>Notes</label><input id="evNotes" placeholder="Optional"/></div>
+</div>
+<div style="display:flex;gap:8px;justify-content:flex-end">
+<button class="btn ghost" id="evDelete" style="display:none">Delete</button>
+<button class="btn" id="evSave">Save</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+(function(){
+  var DB = 'udhav.calendar.v1';
+  var grid = document.getElementById('calendarGrid');
+  var label = document.getElementById('calMonthLabel');
+  var prev = document.getElementById('calPrev');
+  var next = document.getElementById('calNext');
+  var todayBtn = document.getElementById('calToday');
+  var addBtn = document.getElementById('calAdd');
+
+  var modal = document.getElementById('calModal');
+  var closeBtn = document.getElementById('calClose');
+  var evTitle = document.getElementById('evTitle');
+  var evDate  = document.getElementById('evDate');
+  var evTime  = document.getElementById('evTime');
+  var evNotes = document.getElementById('evNotes');
+  var evColor = document.getElementById('evColor');
+  var evSave  = document.getElementById('evSave');
+  var evDelete= document.getElementById('evDelete');
+  var editing = null; // {date:'YYYY-MM-DD', idx:n}
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(DB)) || {}; }catch(e){ return {}; } }
+  function save(v){ try{ localStorage.setItem(DB, JSON.stringify(v)); }catch(e){} }
+
+  function ymd(d){ return d.toISOString().slice(0,10); }
+  function firstOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate()+n); return x; }
+
+  var state = {focus: new Date()};
+  var data = load();
+
+  function build(){
+    if(!grid) return;
+    grid.innerHTML = '';
+    // Header row: days of week (Mon..Sun)
+    var dows = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    dows.forEach(function(d){ var h = document.createElement('div'); h.className='dow'; h.textContent = d; grid.appendChild(h); });
+
+    var cur = new Date(state.focus.getFullYear(), state.focus.getMonth(), 1);
+    var startDow = (cur.getDay()+6)%7; // 0=Mon
+    var start = addDays(cur, -startDow);
+    // 6 weeks * 7 days cells
+    for(var i=0;i<42;i++){
+      (function(i){
+        var day = addDays(start, i);
+        var cell = document.createElement('div'); cell.className='cell';
+        var head = document.createElement('header');
+        var dateEl = document.createElement('div'); dateEl.className='date'; dateEl.textContent = String(day.getDate());
+        var mark = document.createElement('div'); mark.className='badgemark'; mark.textContent='';
+        head.appendChild(dateEl); head.appendChild(mark); cell.appendChild(head);
+
+        // Styles
+        if(day.getMonth() !== state.focus.getMonth()){ cell.classList.add('other-month'); }
+        if(ymd(day) === ymd(new Date())){ cell.classList.add('today'); mark.textContent = 'Today'; }
+
+        // Events list
+        var list = document.createElement('div'); list.className='events';
+        var key = ymd(day);
+        var evs = data[key] || [];
+        evs.slice(0,3).forEach(function(e, idx){
+          var item = document.createElement('div'); item.className='event';
+          var dot = document.createElement('span'); dot.className='dot'; dot.style.background = e.color || '#a78bfa';
+          var title = document.createElement('span'); title.textContent = (e.time? e.time+' · ' : '') + e.title;
+          item.appendChild(dot); item.appendChild(title);
+          // Edit on click
+          item.addEventListener('click', function(ev){ ev.stopPropagation(); openModal(key, idx); });
+          list.appendChild(item);
+        });
+        if(evs.length>3){
+          var more = document.createElement('div'); more.className='event'; more.textContent = '+'+(evs.length-3)+' more';
+          list.appendChild(more);
+        }
+        cell.appendChild(list);
+
+        // Add event on click day
+        cell.addEventListener('click', function(){ openModal(key, null); });
+        grid.appendChild(cell);
+      })(i);
+    }
+
+    // Month label
+    var fmt = state.focus.toLocaleString(undefined, {month:'long', year:'numeric'});
+    label.textContent = fmt;
+  }
+
+  function openModal(dateStr, index){
+    editing = (index===null? null : {date:dateStr, idx:index});
+    modal.style.display='flex';
+    document.body.style.overflow='hidden';
+    // Prefill
+    if(editing){
+      var e = (data[editing.date]||[])[editing.idx];
+      evTitle.value = e && e.title || '';
+      evDate.value  = editing.date;
+      evTime.value  = e && e.time || '';
+      evColor.value = e && e.color || '#a78bfa';
+      evNotes.value = e && e.notes || '';
+      evDelete.style.display = 'inline-flex';
+      document.getElementById('calModalTitle').textContent = 'Edit Event';
+    }else{
+      evTitle.value=''; evTime.value=''; evNotes.value=''; evColor.value='#a78bfa';
+      evDate.value = dateStr || ymd(new Date());
+      evDelete.style.display = 'none';
+      document.getElementById('calModalTitle').textContent = 'New Event';
+    }
+  }
+  function closeModal(){
+    modal.style.display='none';
+    document.body.style.overflow='auto';
+  }
+
+  // Actions
+  prev && prev.addEventListener('click', function(){ state.focus = new Date(state.focus.getFullYear(), state.focus.getMonth()-1, 1); build(); });
+  next && next.addEventListener('click', function(){ state.focus = new Date(state.focus.getFullYear(), state.focus.getMonth()+1, 1); build(); });
+  todayBtn && todayBtn.addEventListener('click', function(){ state.focus = new Date(); build(); });
+  addBtn && addBtn.addEventListener('click', function(){ openModal(ymd(new Date()), null); });
+  document.getElementById('calClose') && document.getElementById('calClose').addEventListener('click', closeModal);
+
+  evSave && evSave.addEventListener('click', function(){
+    var d = (evDate.value || '').trim();
+    var t = (evTitle.value || '').trim();
+    var ti= (evTime.value || '').trim();
+    var c = evColor.value || '#a78bfa';
+    var n = (evNotes.value || '').trim();
+    if(!d || !t){ alert('Please enter a date and title'); return; }
+    data[d] = data[d] || [];
+    if(editing){
+      data[editing.date][editing.idx] = {title:t, time:ti, color:c, notes:n};
+    }else{
+      data[d].push({title:t, time:ti, color:c, notes:n});
+    }
+    save(data);
+    closeModal();
+    build();
+  });
+  evDelete && evDelete.addEventListener('click', function(){
+    if(!editing){ return; }
+    var arr = data[editing.date] || [];
+    arr.splice(editing.idx, 1);
+    if(arr.length === 0){ delete data[editing.date]; } else { data[editing.date] = arr; }
+    save(data);
+    closeModal();
+    build();
+  });
+
+  // If user navigates to Calendar tab, ensure it's rendered
+  function maybeBuildOnShow(){
+    var cal = document.getElementById('calendarScreen');
+    if(cal && cal.style.display !== 'none'){
+      build();
+    }
+  }
+  // Observe tab changes by polling occasionally to avoid wiring deep into other code
+  setInterval(maybeBuildOnShow, 600);
+
+  // Initial render if calendar is visible
+  maybeBuildOnShow();
+})();
+</script>
+<script>
+(function(){
+  var bar  = document.getElementById('tabBar');
+  var todo = document.getElementById('todoScreen');
+  var pomo = document.getElementById('pomoScreen');
+  var cal  = document.getElementById('calendarScreen');
+
+  if(!bar) return;
+  var tabs = Array.prototype.slice.call(bar.querySelectorAll('.tab'));
+
+  function toggle(el, on){ if(el){ el.style.display = on ? 'block' : 'none'; } }
+  function setActive(name){
+    tabs.forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-tab')===name); });
+    toggle(todo, name==='home');
+    toggle(pomo, name==='clock');
+    toggle(cal,  name==='calendar');
+    try{ localStorage.setItem('udhav.tab.active', name); }catch(e){}
+    // If switching to calendar, force an immediate build by clicking Today (handler triggers build in that script)
+    if(name==='calendar'){
+      var tbtn = document.getElementById('calToday');
+      if(tbtn){ try{ tbtn.click(); }catch(e){} }
+    }
+  }
+
+  // Re-bind tab clicks (in case earlier script missed Calendar)
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      setActive(t.getAttribute('data-tab'));
+    }, true);
+  });
+
+  // Initial state
+  var saved = null; try{ saved = localStorage.getItem('udhav.tab.active'); }catch(e){}
+  setActive(saved || 'home');
+
+  // Expose for other buttons
+  window.__setTab = setActive;
+  var pomodoroBtn = document.getElementById('pomodoroBtn');
+  var backBtn = document.getElementById('backToTodos');
+  if(pomodoroBtn){ pomodoroBtn.addEventListener('click', function(){ setActive('clock'); }, true); }
+  if(backBtn){ backBtn.addEventListener('click', function(){ setActive('home'); }, true); }
+})();
+</script>
+<!-- Floating Add Button -->
+<button class="fab-btn" id="fabAddTask">+</button>
+<!-- Add Task Modal -->
+<div class="qa-modal" id="addTaskModal">
+<div class="qa-sheet">
+<span class="close">×</span>
+<h2>Add New Task</h2>
+<input id="modalTaskName" placeholder="Task name" type="text"/>
+<button id="modalAddBtn">Add</button>
+</div>
+</div>
+<style>
+.fab-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  font-size: 28px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 1000;
+}
+.fab-btn:hover { background: #0056b3; }
+.qa-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+.qa-sheet {
+  background: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
+}
+.close { float: right; font-size: 28px; cursor: pointer; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const DB = 'udhav.list.stable.v1';
+  const fab = document.getElementById('fabAddTask');
+  const modal = document.getElementById('addTaskModal');
+  const closeBtn = modal.querySelector('.close');
+  const addBtn = document.getElementById('modalAddBtn');
+  const nameInput = document.getElementById('modalTaskName');
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(DB)) || null; } catch(e){ return null; } }
+  function save(st){ try{ localStorage.setItem(DB, JSON.stringify(st)); } catch(e){} }
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+  function addQuickTask(title){
+    let st = load(); if(!st){ alert('App state not ready. Reload and try again.'); return; }
+    const inboxId = (st.projects && st.projects[0] && st.projects[0].id) || (st.projects && st.projects.length ? st.projects[0].id : null);
+    const task = {
+      id: uid(),
+      title: title,
+      notes: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      due: '',
+      projectId: inboxId,
+      tags: [],
+      priority: 'med',
+      completed: false,
+      repeat: 'none'
+    };
+    st.tasks = st.tasks || [];
+    st.tasks.unshift(task);
+    save(st);
+    try { if(window.render) window.render(); else location.reload(); } catch(e){ location.reload(); }
+  }
+
+  if (fab) {
+    fab.addEventListener('click', () => {
+      modal.style.display = 'block';
+      nameInput.value = '';
+      nameInput.focus();
+    });
+  }
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => modal.style.display = 'none');
+  }
+  window.addEventListener('click', (e) => {
+    if (e.target == modal) modal.style.display = 'none';
+  });
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const val = nameInput.value.trim();
+      if (val) {
+        addQuickTask(val);
+        modal.style.display = 'none';
+      }
+    });
+  }
+
+  // Show FAB only on Home tab
+  function updateFab(){
+    let tab = null; try{ tab = localStorage.getItem('udhav.tab.active'); }catch(e){}
+    fab.style.display = (!tab || tab === 'home') ? 'inline-grid' : 'none';
+  }
+  updateFab();
+  setInterval(updateFab, 600);
+
+  // Ensure calendar builds immediately when opened
+  setInterval(() => {
+    let tab = null; try{ tab = localStorage.getItem('udhav.tab.active'); }catch(e){}
+    if(tab === 'calendar'){
+      const t = document.getElementById('calToday');
+      if (t && !t.__clickedOnce){ t.__clickedOnce = true; t.click(); }
+    }
+  }, 800);
+});
+</script>
+</body>
+</html>
